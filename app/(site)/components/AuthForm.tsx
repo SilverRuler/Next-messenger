@@ -66,7 +66,13 @@ const AuthForm = () => {
           router.push('/conversations')
         }
       })
-      .catch(() => toast.error('Something went wrong!'))
+      .catch((error) => {
+        if (error.response?.status === 400) {
+          toast.error(error.response.data || 'ID already exists');
+        } else {
+          toast.error('Something went wrong!');
+        }
+      })
       .finally(() => setIsLoading(false))
     }
 
@@ -121,13 +127,13 @@ const AuthForm = () => {
           onSubmit={handleSubmit(onSubmit)}
         >
           {variant === 'REGISTER' && (
-            <Input
+            <Input 
               disabled={isLoading}
               register={register}
               errors={errors}
               required
               id="name" 
-              label="Name"
+              label="Name" 
             />
           )}
           <Input 
@@ -136,8 +142,8 @@ const AuthForm = () => {
             errors={errors}
             required
             id="email" 
-            label="Email address" 
-            type="email"
+            label="ID" 
+            type="text"
           />
           <Input 
             disabled={isLoading}

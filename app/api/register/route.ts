@@ -9,21 +9,32 @@ export async function POST(
   try {
     const body = await request.json();
     const {
-      email,
+      email: username, 
       name,
       password
     } = body;
 
-    if (!email || !name || !password) {
+    if (!username || !name || !password) {
       return new NextResponse('Missing fields', { status: 400 });
+    }
+
+    // 아이디 중복 체크 (DB의 email 필드 사용)
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email: username
+      }
+    });
+
+    if (existingUser) {
+      return new NextResponse('ID already exists', { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.create({
       data: {
-        email,
-        name,
+        email: username,
+        name: name,
         hashedPassword
       }
     });
