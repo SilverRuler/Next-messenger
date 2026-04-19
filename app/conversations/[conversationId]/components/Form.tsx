@@ -11,7 +11,6 @@ import {
   useForm 
 } from "react-hook-form";
 import axios from "axios";
-import { CldUploadButton } from "next-cloudinary";
 import useConversation from "@/app/hooks/useConversation";
 
 const Form = () => {
@@ -38,11 +37,18 @@ const Form = () => {
     })
   }
 
-  const handleUpload = (result: any) => {
-    axios.post('/api/messages', {
-      image: result.info.secure_url,
-      conversationId: conversationId
-    })
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        axios.post('/api/messages', {
+          image: reader.result,
+          conversationId: conversationId
+        })
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   return ( 
@@ -59,13 +65,21 @@ const Form = () => {
         w-full
       "
     >
-      <CldUploadButton 
-        options={{ maxFiles: 1 }} 
-        onUpload={handleUpload} 
-        uploadPreset="pgc9ehd5"
-      >
-        <HiPhoto size={30} className="text-sky-500" />
-      </CldUploadButton>
+      <div className="relative">
+        <input 
+          type="file" 
+          id="image-upload" 
+          className="hidden" 
+          accept="image/*"
+          onChange={handleUpload}
+        />
+        <label 
+          htmlFor="image-upload" 
+          className="cursor-pointer hover:opacity-75 transition"
+        >
+          <HiPhoto size={30} className="text-sky-500" />
+        </label>
+      </div>
       <form 
         onSubmit={handleSubmit(onSubmit)} 
         className="flex items-center gap-2 lg:gap-4 w-full"

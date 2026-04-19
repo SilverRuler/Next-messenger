@@ -46,10 +46,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const image = watch('image');
 
-  const handleUpload = (result: any) => {
-    setValue('image', result.info.secure_url, { 
-      shouldValidate: true 
-    });
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setValue('image', reader.result, { 
+          shouldValidate: true 
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
@@ -109,23 +116,40 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   <Image
                     width="48"
                     height="48" 
-                    className="rounded-full" 
+                    className="rounded-full object-cover" 
                     src={image || currentUser?.image || '/images/placeholder.jpg'}
                     alt="Avatar"
                   />
-                  <CldUploadButton 
-                    options={{ maxFiles: 1 }} 
-                    onUpload={handleUpload} 
-                    uploadPreset="pgc9ehd5"
-                  >
-                    <Button
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id="photo"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleUpload}
                       disabled={isLoading}
-                      secondary
-                      type="button"
+                    />
+                    <label
+                      htmlFor="photo"
+                      className="
+                        cursor-pointer
+                        rounded-md
+                        bg-white
+                        px-3
+                        py-2
+                        text-sm
+                        font-semibold
+                        text-gray-900
+                        shadow-sm
+                        ring-1
+                        ring-inset
+                        ring-gray-300
+                        hover:bg-gray-50
+                      "
                     >
                       Change
-                    </Button>
-                  </CldUploadButton>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
