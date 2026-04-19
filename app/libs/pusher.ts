@@ -6,7 +6,9 @@ export const pusherServer = new PusherServer({
   key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
   secret: process.env.PUSHER_SECRET!,
   cluster: 'eu',
-  useTLS: true,
+  host: '127.0.0.1',
+  port: '6001',
+  useTLS: false,
 });
 
 export const pusherClient = new PusherClient(
@@ -17,5 +19,10 @@ export const pusherClient = new PusherClient(
       transport: 'ajax',
     },
     cluster: 'eu',
+    wsHost: typeof window !== 'undefined' ? window.location.hostname : '127.0.0.1',
+    wsPort: 6001,
+    forceTLS: false,
+    disableStats: true,
+    enabledTransports: ['ws', 'wss'],
   }
 );
