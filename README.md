@@ -1,93 +1,85 @@
-# Real-Time Messenger Clone: Next.js 13, React, Tailwind, Prisma, MongoDB, NextAuth, Pusher (2023)
+# Real-Time Messenger (Next.js 13)
 
-![Copy of Copy of Fullstack Twitter Clone (1)](https://user-images.githubusercontent.com/23248726/236631198-90414da5-ee43-46a9-8898-70b003bcd83d.png)
+이 프로젝트는 Next.js 13의 App Router를 기반으로 한 실시간 메신저 애플리케이션입니다. 외부 서비스 의존성을 최소화하고 로컬 환경(Docker)에서 모든 실시간 기능과 데이터베이스를 구동할 수 있도록 최적화되었습니다.
 
+## 🚀 주요 특징
+- **실시간 채팅**: Soketi(Pusher 호환)를 사용하여 로컬 웹소켓 서버로 실시간 메시지 송수신.
+- **간편 로그인**: 이메일 주소 없이 **아이디, 이름, 비밀번호**만으로 회원가입 및 로그인 가능.
+- **이미지 공유**: 별도의 호스팅 서비스 없이 로컬 MongoDB에 Base64 형태로 프로필 및 채팅 이미지 저장.
+- **반응형 디자인**: Tailwind CSS를 사용한 모바일 및 데스크탑 최적화 UI.
 
-This is a repository for a Real-Time Messenger Clone: Next.js 13, React, Tailwind, Prisma, MongoDB, NextAuth, Pusher.
+## 🛠 기술 스택
+- **Language**: TypeScript
+- **Frontend**: Next.js 13 (App Router), React, Tailwind CSS, Headless UI
+- **Backend**: Next.js API Routes (Route Handlers)
+- **Database**: MongoDB (Replica Set 모드 필수)
+- **ORM**: Prisma
+- **Real-time**: Soketi (Pusher-compatible WebSocket server)
+- **Authentication**: Next-Auth (Custom Credentials)
+- **State Management**: Zustand
 
-[VIDEO TUTORIAL](https://www.youtube.com/watch?v=PGPGcKBpAk8)
+## 📋 사전 준비 사항
+- **Node.js**: v18 이상 권장
+- **Docker**: MongoDB 및 Soketi 실행용
 
-Master the art of building a real-time Messenger clone using the latest web development technologies. In this comprehensive tutorial, we'll walk you through the process of creating a fully-functional and visually stunning chat application that rivals the best in the industry.
+## 🏃 실행 방법
 
-Key Features:
-
-- Real-time messaging using Pusher
-- Message notifications and alerts
-- Tailwind design for sleek UI
-- Tailwind animations and transition effects
-- Full responsiveness for all devices
-- Credential authentication with NextAuth
-- Google authentication integration
-- Github authentication integration
-- File and image upload using Cloudinary CDN
-- Client form validation and handling using react-hook-form
-- Server error handling with react-toast
-- Message read receipts
-- Online/offline user status
-- Group chats and one-on-one messaging
-- Message attachments and file sharing
-- User profile customization and settings
-- How to write POST, GET, and DELETE routes in route handlers (app/api)
-- How to fetch data in server React components by directly accessing the database (WITHOUT API! like Magic!)
-- Handling relations between Server and Child components in a real-time environment
-- Creating and managing chat rooms and channels
-
-Whether you're an experienced developer looking to expand your skillset or a beginner eager to learn the latest web development technologies, this tutorial has something for everyone. Join us on this exciting journey and take your web development skills to new heights!
-
-
-### Prerequisites
-
-**Node version 14.x**
-
-### Cloning the repository
-
-```shell
-git clone https://github.com/AntonioErdeljac/next13-messenger.git
+### 1. 저장소 클론
+```bash
+git clone https://github.com/SilverRuler/Next-messenger.git
+cd Next-messenger
 ```
 
-### Install packages
-
-```shell
-npm i
+### 2. 의존성 설치
+```bash
+npm install
 ```
 
-### Setup .env file
+### 3. 환경 변수 설정
+`.env` 파일을 생성하고 아래 내용을 입력합니다.
+```env
+DATABASE_URL="mongodb://localhost:27017/messenger?replicaSet=rs0&authSource=admin"
+NEXTAUTH_SECRET="your_secret_key_here"
 
-
-```js
-DATABASE_URL=
-NEXTAUTH_SECRET=
-
-NEXT_PUBLIC_PUSHER_APP_KEY=
-PUSHER_APP_ID=
-PUSHER_SECRET=
-
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
-
-GITHUB_ID=
-GITHUB_SECRET=
-
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
+NEXT_PUBLIC_PUSHER_APP_KEY="app-key"
+PUSHER_APP_ID="app-id"
+PUSHER_SECRET="app-secret"
 ```
 
-### Setup Prisma
+### 4. 인프라 실행 (Docker)
+실시간 통신과 트랜잭션 지원을 위해 아래 컨테이너들을 실행합니다.
 
-```shell
+**MongoDB (Replica Set 모드)**:
+```bash
+docker run -d --name mongodb -p 27017:27017 mongo:latest --replSet rs0
+# 잠시 대기 후 Replica Set 초기화
+docker exec mongodb mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]})"
+```
+
+**Soketi (실시간 서버)**:
+```bash
+docker run -d --name soketi -p 6001:6001 -p 9601:9601 quay.io/soketi/soketi:latest-16-alpine
+```
+
+### 5. 데이터베이스 스키마 적용
+```bash
 npx prisma db push
-
 ```
 
-### Start the app
+### 6. 빌드 및 시작
+저사양 환경(2 Core, 4GB RAM 등)에서는 아래 명령어로 리소스를 제한하여 빌드하는 것을 권장합니다.
+```bash
+# 빌드
+taskset -c 0 env NODE_OPTIONS="--max-old-space-size=2048" npm run build
 
-```shell
-npm run dev
+# 서비스 시작 (외부 접속 허용)
+npm start -- -H 0.0.0.0 -p 3000
 ```
 
-## Available commands
+## 🌐 포트 개방 안내 (Firewall)
+외부에서 접속하기 위해 다음 포트들이 열려 있어야 합니다.
+- **3000**: 웹 애플리케이션 접속용 (HTTP)
+- **6001**: 실시간 웹소켓(WS) 통신용 (Soketi)
 
-Running commands with npm `npm run [command]`
-
-| command         | description                              |
-| :-------------- | :--------------------------------------- |
-| `dev`           | Starts a development instance of the app |
+---
+Developed by SilverRuler.
