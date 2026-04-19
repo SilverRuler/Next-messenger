@@ -48,7 +48,12 @@ export const authOptions: AuthOptions = {
           throw new Error('Invalid credentials');
         }
 
-        return user;
+        // 로그인 시 사용자 정보 중 'image'를 제외한 핵심 정보만 반환 (쿠키 용량 문제 해결)
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name
+        };
       }
     })
   ],

@@ -24,7 +24,13 @@ const useRoutes = () => {
     },
     {
       label: 'Logout', 
-      onClick: () => signOut(),
+      onClick: () => {
+        signOut({ redirect: false }).then(() => {
+          if (typeof window !== 'undefined') {
+            window.location.replace('/');
+          }
+        });
+      },
       href: '#',
       icon: HiArrowLeftOnRectangle, 
     }
