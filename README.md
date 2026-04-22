@@ -1,3 +1,7 @@
+```bash
+https://aial.silverruler.xyz
+```
+
 # Next.js 13 Messenger (Vercel Deployment Guide)
 
 이 프로젝트는 Next.js 13, MongoDB Atlas, Pusher, Cloudinary를 사용하여 Vercel 무료 티어 환경에서 동작하도록 최적화된 실시간 메신저 애플리케이션입니다.
