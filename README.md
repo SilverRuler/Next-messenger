@@ -1,6 +1,7 @@
 ##
-[aial.silverruler.xyz](https://aial.silverruler.xyz)  
-
+### AIAL CHAT ###
+- **작동 페이지** [aial.silverruler.xyz](https://aial.silverruler.xyz)  
+##
 
 # Next.js 13 Messenger (Vercel Deployment Guide)
 
