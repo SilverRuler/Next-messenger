@@ -33,7 +33,7 @@ const Auth = () => {
             text-gray-900
           "
           >
-            AIAL Dedicated Messenger
+            AIAL Emergency Messenger <br></br>
             Sign in to your account
         </h2>
       </div>
